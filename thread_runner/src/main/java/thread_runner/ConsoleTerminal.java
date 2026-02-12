@@ -85,11 +85,11 @@ public class ConsoleTerminal {
 		}
 	}
 
-	public List<String> getPlayerNames(int playerCount) throws IOException {
+	public List<String> getPlayerNames() throws IOException {
 		println(header + "플레이어 이름을 한 명씩 입력해주세요.");
 		List<String> playerNames = new ArrayList<>();
-		int half = playerCount / 2;
-		for (int i = 0; i < playerCount; i++) {
+		int half = Main.playerCount / 2;
+		for (int i = 0; i < Main.playerCount; i++) {
 			if (i < half) {
 				print(header + ColorCode.blue + "[블루팀] " + ColorCode.reset);
 			} else {

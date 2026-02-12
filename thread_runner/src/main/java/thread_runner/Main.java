@@ -5,6 +5,7 @@ import java.util.List;
 
 public class Main {
 	
+	public static int playerCount = 8;
 	public static List<String> playerNames;
 	static String header = "[" + ColorCode.orange + "Thread " + ColorCode.green + "Runner" + ColorCode.reset + "] ";
 
@@ -12,12 +13,14 @@ public class Main {
 		ConsoleTerminal terminal = new ConsoleTerminal();
 		
 		terminal.printInit();
-		int playerCount = terminal.selectPlayerCount();
-		playerNames = terminal.getPlayerNames(playerCount);
+//		int playerCount = terminal.selectPlayerCount();
+//		playerNames = terminal.getPlayerNames(playerCount);
+		playerNames = terminal.getPlayerNames();
 		
-		ProgressBarManager manager = new ProgressBarManager(terminal, playerCount);
+//		ProgressBarManager manager = new ProgressBarManager(terminal, playerCount);
+		ProgressBarManager manager = new ProgressBarManager(terminal);
 		
-		terminal.loading();
+//		terminal.loading();
 		
 		Runnable[] tasks = createThreadTask(manager);
 		Thread[] players = new Thread[playerCount];
@@ -39,48 +42,56 @@ public class Main {
 	}
 	
 	private static Runnable[] createThreadTask(ProgressBarManager manager) {
-		Runnable[] tasks = new Runnable[playerNames.size()];
+		Runnable[] tasks = new Runnable[playerCount];
 		
-		for (int i=0; i<playerNames.size(); i++) {
+		for (int i=0; i<playerCount; i++) {
 			int threadIndex = i; 
 	        String name = playerNames.get(i);
 	        
 			tasks[i] = () -> {
 				int progress = 0;
-				boolean WaitedFirst = false;
-				boolean WaitedSecond = false;
-				boolean WaitedThird = false;
+				int goal = 100;
+				boolean[] isPassedSpot = new boolean[4];
+				int[] spotPercent = new int[] {20, 40, 60, 80};
 				
-				while (progress <= 100) {			
+				while (progress <= goal) {			
 					manager.update(threadIndex, progress, false);
-					if (progress == 100) break;
+					if (progress == goal) break;
 					
-					// [핵심] 50% 도달 시 팀원 기다리기
-			        if (progress >= 25 && !WaitedFirst) {
-			            try {
-			                manager.update(threadIndex, 25, true); // 50% 지점에서 잠깐 멈춤을 시각적으로 보여줌
+					// [핵심] spot 지점 도달 시 팀원 기다리기
+			        if (progress >= spotPercent[0] && !isPassedSpot[0]) {
+			            try {	            	
+			                manager.update(threadIndex, spotPercent[0], false); // 50% 지점에서 잠깐 멈춤을 시각적으로 보여줌
 			                manager.waitForTeam(threadIndex, 0);
-			                WaitedFirst = true; 
+			            	isPassedSpot[0] = true; 
 			            } catch (InterruptedException e) {
 			                Thread.currentThread().interrupt();
 			            }
-			        } else if (progress >= 50 && !WaitedSecond) {
-			            try {
-			                manager.update(threadIndex, 50, true); // 50% 지점에서 잠깐 멈춤을 시각적으로 보여줌
+			        } else if (progress >= spotPercent[1] && !isPassedSpot[1]) {
+			        	try {	            	
+			                manager.update(threadIndex, spotPercent[1], false); // 50% 지점에서 잠깐 멈춤을 시각적으로 보여줌
 			                manager.waitForTeam(threadIndex, 1);
-			                WaitedSecond = true; 
+			            	isPassedSpot[1] = true; 
 			            } catch (InterruptedException e) {
 			                Thread.currentThread().interrupt();
 			            }
-			        } else if (progress >= 75 && !WaitedThird) {
-			            try {
-			                manager.update(threadIndex, 75, true); // 50% 지점에서 잠깐 멈춤을 시각적으로 보여줌
+			        } else if (progress >= spotPercent[2] && !isPassedSpot[2]) {
+			        	try {	            	
+			                manager.update(threadIndex, spotPercent[2], false); // 50% 지점에서 잠깐 멈춤을 시각적으로 보여줌
 			                manager.waitForTeam(threadIndex, 2);
-			                WaitedThird = true; 
+			            	isPassedSpot[2] = true; 
 			            } catch (InterruptedException e) {
 			                Thread.currentThread().interrupt();
 			            }
-			        } 
+			        } else if (progress >= spotPercent[3] && !isPassedSpot[3]) {
+			        	try {	            	
+			                manager.update(threadIndex, spotPercent[3], false); // 50% 지점에서 잠깐 멈춤을 시각적으로 보여줌
+			                manager.waitForTeam(threadIndex, 3);
+			            	isPassedSpot[3] = true; 
+			            } catch (InterruptedException e) {
+			                Thread.currentThread().interrupt();
+			            }
+			        }
 			        
 					try { 
 						Thread.sleep((int)(Math.random() * 250)); 
