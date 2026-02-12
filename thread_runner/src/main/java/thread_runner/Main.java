@@ -11,12 +11,13 @@ public class Main {
 	public static void main(String[] args) throws IOException, InterruptedException {
 		ConsoleTerminal terminal = new ConsoleTerminal();
 		
+		terminal.print("\033[2J\033[H\033[?25l");
 		terminal.printInit();
 		playerNames = terminal.getPlayerNames();
 		
 		ProgressBarManager manager = new ProgressBarManager(terminal);
 		
-		terminal.loading();
+		//terminal.loading();
 		
 		Runnable[] tasks = createThreadTask(manager);
 		Thread[] players = new Thread[playerCount];
