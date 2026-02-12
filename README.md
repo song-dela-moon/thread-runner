@@ -69,8 +69,8 @@
 
 ### 렌더링 방식 전환 (Full Repaint -> Target Update)  
 - **기존 방식**: 갱신 시마다 로고와 8개 바 전체를 재출력하여 데이터 전송량이 많고 깜빡임이 심했습니다.  
-- **개선 방식(Check Last State)**: 초기 1회 로고 출력 후, 커서를 해당 행으로 이동시켜 변경된 라인만 덮어쓰는 Dirty Checking을 도입했습니다.  
-- **성능 향상 지표:** 총 시스템 호출(System Call) 횟수가 2,751회에서 1,134회로 약 **58%** 감소했습니다.
+- **개선 방식**: 초기 1회 로고 출력 후, 커서를 해당 행으로 이동시켜 변경된 라인만 덮어쓰는 Dirty Checking을 도입했습니다.  
+- **성능 향상**: 총 시스템 호출(System Call) 횟수가 2,751회에서 1,134회로 약 **58%** 감소했습니다.
 ---
 
 ## 실행 방법  
@@ -80,11 +80,12 @@ git clone https://github.com/HeeYeon-Ko/thread-runner.git
 ``` 
 ### 2. 빌드 및 실행  
 #### [방법 1] Windows / Eclipse 사용 시  
-1. 프로젝트를 Eclipse로 Import 합니다 (Existing Maven Projects).  
-2. 프로젝트 우클릭 -> Export 선택.  
-3. Java -> Runnable JAR file 선택.  
-4. Launch configuration에서 'Main - thread_runner'를 선택하고 저장 경로를 지정하여 내보냅니다.  
-5. 생성된 .jar 파일을 더블 클릭하거나 `java -jar 파일명.jar`로 실행합니다.  
+1. Eclipse의 Workspace를 README.md가 있는 최상위 폴더(`thread-runner`)로 지정하여 엽니다.  
+2. [File] -> [Import...] -> [Existing Maven Projects]를 선택합니다.  
+3. Root Directory를 최상위 폴더 내부의 `thread_runner` 디렉토리로 선택하여 프로젝트를 불러옵니다.  
+4. 프로젝트 우클릭 -> [Export...] -> [Java] -> [Runnable JAR file]을 선택합니다.  
+5. Launch configuration에서 'Main - thread_runner'를 선택하고 저장 경로를 지정하여 내보냅니다.  
+6. 생성된 .jar 파일을 더블 클릭하거나 `java -jar 파일명.jar` 명령어로 실행합니다.  
 
 #### [방법 2] Maven이 설치된 경우  
 ```bash
