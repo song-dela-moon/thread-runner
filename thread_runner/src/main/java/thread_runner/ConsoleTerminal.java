@@ -3,6 +3,7 @@ package thread_runner;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.ref.Cleaner.Cleanable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,39 +83,32 @@ public class ConsoleTerminal {
 		print(".");
 		Thread.sleep(1500);
 
-		print("\r" + header + "                   ");
+		cleanConsole();
 		print("\r" + header + "플레이어 로딩 완료!");
 		Thread.sleep(1000);
-		print("\r" + header + "                   ");
-		print("\r" + header + "3");
-		Thread.sleep(250);
-		print(".");
-		Thread.sleep(250);
-		print(".");
-		Thread.sleep(250);
-		print(".");
-		Thread.sleep(250);
-		print(" 2");
-		Thread.sleep(250);
-		print(".");
-		Thread.sleep(250);
-		print(".");
-		Thread.sleep(250);
-		print(".");
-		Thread.sleep(250);
-		print(" 1");
-		Thread.sleep(250);
-		print(".");
-		Thread.sleep(250);
-		print(".");
-		Thread.sleep(250);
-		print(".");
-		Thread.sleep(250);
-
-		print("\r" + header + "                  ");
+		cleanConsole();
+		print("\r" + header);
+		for (int i=0; i<12; i++) {
+			if (i%4 == 0) {
+				Integer result = 3-(i/4);
+				print(result.toString());
+			} else {
+				print(".");
+				if (i%4 == 3) {
+					print(" ");
+				}
+			}
+			Thread.sleep(250);
+		}
+		
+		cleanConsole();
 		print("\r" + header + "Start!");
 		Thread.sleep(1000);
 		print("/r");
+	}
+	
+	public void cleanConsole() {
+		print("\r" + header + "                      ");
 	}
 
 	public void printEnding(boolean isBlueTeamWin) {

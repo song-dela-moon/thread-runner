@@ -7,9 +7,9 @@ public class ProgressBarManager {
     private final ConsoleTerminal terminal;
     
     private int[] playerProgress;
-    private boolean[] isPlayerWaiting; 
-    private String[] rankDisplay;      
     private int rankCounter = 1;
+    private boolean[] isPlayerPressing; 
+    private String[] rankDisplay;      
     
     private int[] redTeamAtSpot = {1, 2, 3, 4};
     private final Object redTeamLock = new Object();
@@ -24,7 +24,7 @@ public class ProgressBarManager {
     public ProgressBarManager(ConsoleTerminal terminal) {
         this.terminal = terminal;
         this.playerProgress = new int[getPlayerCount()];
-        this.isPlayerWaiting = new boolean[getPlayerCount()];
+        this.isPlayerPressing = new boolean[getPlayerCount()];
         this.rankDisplay = new String[getPlayerCount()];
 
         // 초기화 시 화면 정리
@@ -61,7 +61,7 @@ public class ProgressBarManager {
         synchronized (this) { 
             for (int i = 0; i < getPlayerCount(); i++) {
                 String color;
-                if (isPlayerWaiting[i]) {
+                if (isPlayerPressing[i]) {
                     color = ColorCode.lime;
                 } else {
                     color = isBlueTeam(i) ? ColorCode.blue : ColorCode.red;
@@ -75,7 +75,7 @@ public class ProgressBarManager {
                 sb.append(bar).append(rank).append("\u001B[K\n");
 
                 if (i == (getPlayerCount() / 2) - 1) {
-                    sb.append("\u001B[K\n"); 
+                    sb.append(terminal.header + "\u001B[K\n"); 
                 }
             }
         }
@@ -89,38 +89,49 @@ public class ProgressBarManager {
     }
 
     private String formatBar(String name, int percent, String color) {
-        int width = 50; 
+        int width = 45; 
         int filled = (int) (width * (percent / 100.0));
         
+        // 프로그레스바 그리기
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format(" %-8s: [", name)); 
-        
+        sb.append(terminal.header);
+        sb.append(String.format(" %s: [", name));
         sb.append(color);
         for (int i = 0; i < width; i++) {
             if (i < filled) sb.append("■");
             else sb.append(" ");
         }
         sb.append(ColorCode.reset).append("] ").append(String.format("%3d%%", percent));
+        
         return sb.toString();
     }
 
-    // 로직 업데이트 메서드들 (이전과 동일)
     public synchronized void update(int playerIndex, int percent) {
         update(playerIndex, percent, false);
     }
 
-    public synchronized void update(int playerIndex, int percent, boolean isWaiting) {
+    public synchronized void update(int playerIndex, int percent, boolean isPressing) {
+    	// 1등으로 들어오는 쓰레드 팀이 승리
         if (playerProgress[playerIndex] != 0 && percent == 100) {
             if (isBlueTeamWin == null) isBlueTeamWin = isBlueTeam(playerIndex);
         }
         playerProgress[playerIndex] = percent;
-        isPlayerWaiting[playerIndex] = isWaiting;
+        isPlayerPressing[playerIndex] = isPressing;
     }
 
     public synchronized void completeTask(String threadName, int index) {
         int currentRank = rankCounter++;
-        String trophyColor = isBlueTeam(index) ? ColorCode.blue : ColorCode.red;
-        rankDisplay[index] = String.format("  %s%d등%s", trophyColor, currentRank, ColorCode.reset);
+        String teamColor = isBlueTeam(index) ? ColorCode.blue : ColorCode.red;
+        rankDisplay[index] = String.format("  %s%d등%s", teamColor, currentRank, ColorCode.reset);
+        
+        // 포디움은 메달 추가
+        if (currentRank == 1) {
+        	rankDisplay[index] += "🥇" ;
+        } else if (currentRank == 2) {
+        	rankDisplay[index] += "🥈" ;
+        } else if (currentRank == 3) {
+        	rankDisplay[index] += "🥉" ;
+        }
     }
 
     private boolean isBlueTeam(int playerIndex) {
@@ -137,14 +148,14 @@ public class ProgressBarManager {
         int[] waitCount = isBlue ? blueTeamAtSpot : redTeamAtSpot;
 
         synchronized (lock) {
-            waitCount[spot]--; 
+            waitCount[spot]--; 	// 내가 도착했으므로 카운트 감소
 
-            if (waitCount[spot] > 0) {
+            if (waitCount[spot] > 0) {	// 팀원을 기다려야 하는 경우 대기
                 update(threadIndex, playerProgress[threadIndex], true);
                 lock.wait();
-            } else if (waitCount[spot] == 0) {
+            } else if (waitCount[spot] == 0) { // 문을 열 마지막 팀원인 경우
                 update(threadIndex, playerProgress[threadIndex], true);
-                Thread.sleep(2000);
+                Thread.sleep(2000);	// 문 열리는 시간(2초) 대기 후 쓰레드 모두 깨우기
                 lock.notifyAll();
             }
         }
@@ -159,6 +170,6 @@ public class ProgressBarManager {
         render();
 
         terminal.print("\033[?25h"); 
-        return isBlueTeamWin != null ? isBlueTeamWin : false;
+        return isBlueTeamWin != null ? isBlueTeamWin : false;	// 승리팀 정보 리턴
     }
 }

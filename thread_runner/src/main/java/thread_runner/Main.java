@@ -15,9 +15,9 @@ public class Main {
 		terminal.printInit();
 		playerNames = terminal.getPlayerNames();
 		
+		terminal.loading();
 		ProgressBarManager manager = new ProgressBarManager(terminal);
 		
-		//terminal.loading();
 		
 		Runnable[] tasks = createThreadTask(manager);
 		Thread[] players = new Thread[playerCount];
