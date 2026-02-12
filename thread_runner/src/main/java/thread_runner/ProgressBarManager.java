@@ -12,15 +12,11 @@ public class ProgressBarManager {
 	
 	// 레드팀 관련 변수
 	private int[] redTeamAtMid = {1,2,3,4};
-//	private final Object[] redTeamLock = new Object[4];
 	private final Object redTeamLock = new Object();
-	private boolean redTeamWait = false;
 
 	// 블루팀 관련 변수
 	private int[] blueTeamAtMid = {1,2,3,4};	
 	private final Object blueTeamLock = new Object();
-//	private final Object[] blueTeamLock = new Object[4];
-	private boolean blueTeamWait = false;
 
 	// 최종 승리팀
 	private Boolean isBlueTeamWin = null;
@@ -30,11 +26,6 @@ public class ProgressBarManager {
 		this.terminal = terminal;
 		playerProgress = new int[getPlayerCount()];
 		isPlayerWaiting = new boolean[getPlayerCount()];
-		
-//		for (int i=0; i<4; i++) {
-//			redTeamLock[i] = new Object();
-//			blueTeamLock[i] = new Object();
-//		}
 	}
 
 	public synchronized void update(int playerIndex, int percent, boolean isBlocked) {
@@ -113,11 +104,6 @@ public class ProgressBarManager {
 		sb.append("] " + percent + "%");
 		return sb.toString();
 	}
-	
-//	public boolean isWaiting(int threadIndex, int spot) {
-//		boolean isBlueTeam = isBlueTeam(threadIndex);
-//		return isBlueTeam ? blueTeamWait : redTeamWait;
-//	}
 	
 	public void waitForTeam(int threadIndex, int spot) throws InterruptedException {
 		boolean isBlue = isBlueTeam(threadIndex);

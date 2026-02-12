@@ -13,14 +13,11 @@ public class Main {
 		ConsoleTerminal terminal = new ConsoleTerminal();
 		
 		terminal.printInit();
-//		int playerCount = terminal.selectPlayerCount();
-//		playerNames = terminal.getPlayerNames(playerCount);
 		playerNames = terminal.getPlayerNames();
 		
-//		ProgressBarManager manager = new ProgressBarManager(terminal, playerCount);
 		ProgressBarManager manager = new ProgressBarManager(terminal);
 		
-//		terminal.loading();
+		terminal.loading();
 		
 		Runnable[] tasks = createThreadTask(manager);
 		Thread[] players = new Thread[playerCount];
